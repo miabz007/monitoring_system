@@ -44,7 +44,7 @@ The agent communicates with the office API through Tailscale.
 
 ### Architecture Diagram
 
-```text
+
              ONSITE CONSTRUCTION SITES
 
    +-------------------+   +-------------------+
@@ -70,7 +70,7 @@ The agent communicates with the office API through Tailscale.
              +-----------------------+
                          |
                   Office Browser
-```
+
 
 The onsite agents communicate with the API. They do not connect directly to PostgreSQL.
 
@@ -98,7 +98,7 @@ The onsite agents communicate with the API. They do not connect directly to Post
 
 The solution contains two main projects.
 
-### A. redstack_monitoring
+### A. company_monitoring
 
 The central API and dashboard project.
 
@@ -114,8 +114,8 @@ Responsibilities:
 
 Important files:
 
-```text
-redstack_monitoring/
+
+company_monitoring/
 │
 ├── Models/
 │   ├── Device.cs
@@ -132,8 +132,8 @@ redstack_monitoring/
 │
 ├── Program.cs
 ├── appsettings.json
-└── redstack_monitoring.csproj
-```
+└── company_monitoring.csproj
+
 
 ### B. SiteMonitor.Agent
 
@@ -150,7 +150,7 @@ Responsibilities:
 
 Important files:
 
-```text
+
 SiteMonitor.Agent/
 │
 ├── Program.cs
@@ -160,7 +160,7 @@ SiteMonitor.Agent/
 ├── TrayApplication.cs
 ├── appsettings.json
 └── SiteMonitor.Agent.csproj
-```
+
 
 ---
 
@@ -268,15 +268,15 @@ The dashboard currently uses the following statuses:
 
 Database name:
 
-```text
+
 site_monitoring
-```
+
 
 Database user:
 
-```text
+
 site_monitor
-```
+company
 
 ### Devices Table
 
@@ -308,7 +308,7 @@ Stores employee activity records.
 
 Supported event types include:
 
-```text
+companytext
 LOGIN
 LOGOUT
 CLOCK_IN
@@ -319,7 +319,7 @@ LOCK
 UNLOCK
 BREAK_START
 BREAK_END
-```
+company
 
 `HEARTBEAT` is processed separately and should not create a record in this table.
 
@@ -341,17 +341,17 @@ The main API endpoints are:
 
 Swagger is available at:
 
-```text
+companytext
 http://localhost:5080/swagger
-```
+company
 
 ### Dashboard
 
 The monitoring dashboard is available at:
 
-```text
+companytext
 http://localhost:5080/
-```
+company
 
 The dashboard automatically refreshes its information every 10 seconds.
 
@@ -367,7 +367,7 @@ Install:
 2. PostgreSQL 18.
 3. .NET 10 runtime or deployment prerequisites.
 4. Tailscale.
-5. The `redstack_monitoring` API application.
+5. The `company_monitoring` API application.
 
 The office PC must remain powered on and connected to the network.
 
@@ -375,25 +375,25 @@ The office PC must remain powered on and connected to the network.
 
 Create the PostgreSQL database:
 
-```sql
+companysql
 CREATE DATABASE site_monitoring;
-```
+company
 
 Configure the database connection string in the API project's `appsettings.json`.
 
 Apply Entity Framework Core migrations:
 
-```powershell
+companypowershell
 dotnet ef database update
-```
+company
 
 ### 9.3 Running the API
 
 From the API project directory:
 
-```powershell
+companypowershell
 dotnet run --urls "http://0.0.0.0:5080"
-```
+company
 
 The API will listen on port 5080.
 
@@ -403,7 +403,7 @@ Each onsite PC requires its own monitoring agent configuration.
 
 Example `appsettings.json`:
 
-```json
+companyjson
 {
   "Monitoring": {
     "ServerUrl": "http://OFFICE-TAILSCALE-IP:5080",
@@ -411,7 +411,7 @@ Example `appsettings.json`:
     "HeartbeatIntervalSeconds": 30
   }
 }
-```
+company
 
 Replace:
 
@@ -426,9 +426,9 @@ Each onsite PC must have the correct device ID.
 
 The agent can be published as a self-contained Windows application:
 
-```powershell
+companypowershell
 dotnet publish -c Release -r win-x64 --self-contained true
-```
+company
 
 Copy the published application folder to the onsite PC.
 
@@ -481,9 +481,9 @@ Check:
 
 Check the device information using:
 
-```text
+companytext
 GET /api/devices
-```
+company
 
 Review the `LastHeartbeat` value.
 
@@ -491,28 +491,28 @@ Review the `LastHeartbeat` value.
 
 Verify that the agent can access:
 
-```text
+companytext
 http://OFFICE-TAILSCALE-IP:5080/health/db
-```
+company
 
 ### Dashboard Does Not Update
 
 Check whether the API is running and whether the browser can access:
 
-```text
+companytext
 http://localhost:5080/
-```
+company
 
 ### Employee Status Incorrect
 
 Check the latest events in the `MonitoringEvents` table.
 
-```sql
+companysql
 SELECT *
 FROM "MonitoringEvents"
 ORDER BY "EventTime" DESC
 LIMIT 50;
-```
+company
 
 ---
 
@@ -549,7 +549,7 @@ The system is designed around the following principles:
 ---
 
 **Project:** Onsite Employee PC Monitoring System  
-**Backend:** `redstack_monitoring`  
+**Backend:** `company_monitoring`  
 **Monitoring Agent:** `SiteMonitor.Agent`  
 **Database:** PostgreSQL 18  
 **Framework:** .NET 10  
