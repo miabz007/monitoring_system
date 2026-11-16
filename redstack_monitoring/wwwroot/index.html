@@ -1,0 +1,1189 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Monitoring Dashboard</title>
+
+    <style>
+        :root {
+            --primary: #b91c2c;
+            --primary-dark: #8f1522;
+            --primary-light: #fff0f1;
+            --background: #f5f6f8;
+            --surface: #ffffff;
+            --text: #20242d;
+            --muted: #858b98;
+            --border: #eceef2;
+            --green: #15966a;
+            --yellow: #d69b18;
+            --red: #d64045;
+            --blue: #4779d8;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        /* Layout */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 245px;
+            background: #871522;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 750;
+            padding: 0 12px 35px;
+            letter-spacing: -0.5px;
+        }
+
+            .brand span {
+                color: #ffb9bf;
+            }
+
+        .nav-label {
+            font-size: 10px;
+            color: #e7aeb3;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            padding: 0 12px;
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            color: #f5dfe1;
+            font-size: 14px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+            .nav-item:hover,
+            .nav-item.active {
+                background: rgba(255,255,255,0.15);
+                color: white;
+            }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar-footer {
+            margin-top: 45px;
+            padding: 15px 12px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            font-size: 12px;
+            color: #e7bfc2;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 30px 35px;
+        }
+
+        /* Header */
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 26px;
+            margin: 0;
+            font-weight: 750;
+            letter-spacing: -0.7px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 13px;
+            margin: 7px 0 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .refresh-info {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 17px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background: var(--primary-dark);
+            }
+
+        .btn-light {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+            .btn-light:hover {
+                background: #f8f8fa;
+            }
+
+        /* Statistics */
+
+        .section-heading {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 17px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 3px 12px rgba(20,20,30,0.025);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .stat-card::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 4px;
+                height: 100%;
+                background: var(--card-color);
+            }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            background: var(--icon-bg);
+            color: var(--card-color);
+            font-size: 17px;
+        }
+
+        .stat-number {
+            font-size: 31px;
+            font-weight: 750;
+            margin-top: 15px;
+            letter-spacing: -1px;
+        }
+
+        /* Content panels */
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 23px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(20,20,30,0.025);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .panel-description {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .search-input {
+            padding: 10px 13px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 13px;
+            min-width: 210px;
+            outline: none;
+        }
+
+            .search-input:focus,
+            select:focus,
+            input:focus {
+                border-color: var(--primary);
+                outline: 2px solid rgba(185,28,44,0.08);
+            }
+
+        /* Tables */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            white-space: nowrap;
+        }
+
+        th {
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #8a909d;
+            font-weight: 700;
+            background: #fafafb;
+            padding: 14px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 15px;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f1f4;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+            tbody tr:hover {
+                background: #fff8f8;
+            }
+
+            tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+        /* Status badges */
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+            .status::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: currentColor;
+            }
+
+        .status-online {
+            color: #13865e;
+            background: #e5f7ef;
+        }
+
+        .status-idle {
+            color: #a66c08;
+            background: #fff5d9;
+        }
+
+        .status-offline {
+            color: #c52d37;
+            background: #ffeaec;
+        }
+
+        .status-locked {
+            color: #4773c6;
+            background: #eaf1ff;
+        }
+
+        .status-default {
+            color: #6b7280;
+            background: #f0f1f3;
+        }
+
+        /* Filters */
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 13px;
+            margin-top: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+            .filter-group label {
+                font-size: 12px;
+                font-weight: 650;
+                color: #626a78;
+            }
+
+            .filter-group select,
+            .filter-group input {
+                min-width: 190px;
+                padding: 10px 12px;
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: 7px;
+                font-family: inherit;
+                font-size: 13px;
+                color: var(--text);
+            }
+
+        /* Messages */
+
+        .message {
+            text-align: center;
+            padding: 35px 15px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .error-message {
+            color: #c52d37;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        .last-refresh {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 15px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 1150px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .main {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .brand {
+                padding: 5px 10px 15px;
+            }
+
+            .sidebar nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 5px;
+            }
+
+            .nav-label,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+                margin: 0;
+                padding: 10px;
+            }
+
+            .main {
+                padding: 20px 15px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 26px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+       
+
+
+        <!-- MAIN CONTENT -->
+
+        <main class="main" id="dashboard">
+
+            <!-- HEADER -->
+
+            <header class="topbar">
+
+                <div class="page-title">
+                    <h1>Onsite Monitoring</h1>
+                    <p>Monitor employee computers and system activity.</p>
+                </div>
+
+                <div class="header-actions">
+                    <span class="refresh-info" id="lastRefresh">
+                        Initializing...
+                    </span>
+
+                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+            </header>
+
+
+            <!-- STATISTICS -->
+
+            <h2 class="section-heading">System Overview</h2>
+
+            <section class="stats-grid">
+
+                <div class="stat-card"
+                     style="--card-color: #4779d8; --icon-bg: #fff0f1; ">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Computers</span>
+                        
+                    </div>
+                    <div class="stat-number" id="total">0</div>
+                </div>
+
+                <div class="stat-card"
+                     style="--card-color:#15966a;--icon-bg:#e5f7ef;">
+                    <div class="stat-top">
+                        <span class="stat-label">Online</span>
+                      
+                    </div>
+                    <div class="stat-number" id="online">0</div>
+                </div>
+
+                <div class="stat-card"
+                     style="--card-color:#d69b18;--icon-bg:#fff5d9;">
+                    <div class="stat-top">
+                        <span class="stat-label">Idle</span>
+                     
+                    </div>
+                    <div class="stat-number" id="idle">0</div>
+                </div>
+
+                <div class="stat-card"
+                     style="--card-color: #828181; --icon-bg: #eaf1ff;">
+                    <div class="stat-top">
+                        <span class="stat-label">Locked</span>
+                     
+                    </div>
+                    <div class="stat-number" id="locked">0</div>
+                </div>
+
+                <div class="stat-card"
+                     style="--card-color:#d64045;--icon-bg:#ffeaec;">
+                    <div class="stat-top">
+                        <span class="stat-label">Offline</span>
+                       
+                    </div>
+                    <div class="stat-number" id="offline">0</div>
+                </div>
+
+            </section>
+
+
+            <!-- REGISTERED COMPUTERS -->
+
+            <section class="panel" id="computers">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2 class="panel-title">Registered Computers</h2>
+                        <div class="panel-description">
+                            Current status of all registered employee devices.
+                        </div>
+                    </div>
+
+                    <input type="search"
+                           id="deviceSearch"
+                           class="search-input"
+                           placeholder="Search computer or employee..."
+                           oninput="filterDevices()">
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Computer</th>
+                                <th>Employee</th>
+                                <th>Status</th>
+                                <th>Last Activity</th>
+                                <th>Last Heartbeat</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="deviceList">
+                            <tr>
+                                <td colspan="5" class="message">
+                                    Loading computers...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="last-refresh" id="deviceCount">
+                    0 computers registered
+                </div>
+
+                <div id="error" class="error-message"></div>
+
+            </section>
+
+
+            <!-- EMPLOYEE ACTIVITY -->
+
+            <section class="panel" id="activity">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2 class="panel-title">Employee Activity History</h2>
+                        <div class="panel-description">
+                            Review computer activity and employee events.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- FILTERS -->
+
+                <div class="filters">
+
+                    <div class="filter-group">
+
+                        <label for="employeeFilter">
+                            Employee / Computer
+                        </label>
+
+                        <select id="employeeFilter">
+                            <option value="">All Employees</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="dateFilter">
+                            Activity Date
+                        </label>
+
+                        <input type="date" id="dateFilter">
+
+                    </div>
+
+
+                    <button class="btn btn-primary" onclick="loadEvents()">
+                        Apply Filters
+                    </button>
+
+                    <button class="btn btn-light" onclick="resetEventFilters()">
+                        Clear Filters
+                    </button>
+
+                </div>
+
+
+                <!-- ACTIVITY TABLE -->
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Employee</th>
+                                <th>Computer</th>
+                                <th>Activity</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="activityList">
+
+                            <tr>
+                                <td colspan="4" class="message">
+                                    Loading activity...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="last-refresh" id="activityCount">
+                    Loading activity records...
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script>
+
+// ============================================
+// GLOBAL VARIABLES
+// ============================================
+
+let allDevices = [];
+
+
+// ============================================
+// DATE FORMATTING
+// ============================================
+
+function formatDate(value) {
+
+            if (!value) return "-";
+
+            const date = new Date(value);
+
+            if (isNaN(date.getTime())) return "-";
+
+            return date.toLocaleString();
+
+}
+
+
+// ============================================
+// STATUS BADGE
+// ============================================
+
+function createStatusBadge(value) {
+
+            const status = String(value || "UNKNOWN").toUpperCase();
+
+            const badge = document.createElement("span");
+
+            badge.className = "status";
+
+            const statusClasses = {
+                ONLINE: "status-online",
+                IDLE: "status-idle",
+                OFFLINE: "status-offline",
+                LOCKED: "status-locked"
+            };
+
+            badge.classList.add(
+                statusClasses[status] || "status-default"
+            );
+
+            badge.textContent = status;
+
+            return badge;
+
+}
+
+
+// ============================================
+// LOAD DEVICES
+// ============================================
+
+async function loadDevices() {
+
+            const list = document.getElementById("deviceList");
+            const error = document.getElementById("error");
+
+            try {
+
+                const response = await fetch("/api/devices");
+
+                if (!response.ok) {
+                    throw new Error("Unable to load devices.");
+                }
+
+                const devices = await response.json();
+
+                if (!Array.isArray(devices)) {
+                    throw new Error("Invalid device data received.");
+                }
+
+                allDevices = devices;
+
+                let online = 0;
+                let idle = 0;
+                let offline = 0;
+                let locked = 0;
+
+                devices.forEach(device => {
+
+                    const status =
+                        String(device.currentStatus || "OFFLINE").toUpperCase();
+
+                    if (status === "ONLINE") online++;
+                    else if (status === "IDLE") idle++;
+                    else if (status === "LOCKED") locked++;
+                    else if (status === "OFFLINE") offline++;
+
+                });
+
+
+                // Update statistics
+
+                document.getElementById("total").textContent = devices.length;
+                document.getElementById("online").textContent = online;
+                document.getElementById("idle").textContent = idle;
+                document.getElementById("locked").textContent = locked;
+                document.getElementById("offline").textContent = offline;
+
+
+                // Update employee dropdown
+
+                loadEmployeeFilter(devices);
+
+
+                // Render device table
+
+                filterDevices();
+
+
+                document.getElementById("deviceCount").textContent =
+                    `${devices.length} computers registered`;
+
+                document.getElementById("lastRefresh").textContent =
+                    "Last updated: " + new Date().toLocaleTimeString();
+
+                error.textContent = "";
+
+            } catch (err) {
+
+                error.textContent = err.message;
+
+            }
+
+}
+
+
+// ============================================
+// DEVICE SEARCH
+// ============================================
+
+function filterDevices() {
+
+            const list = document.getElementById("deviceList");
+
+            const search = document
+                .getElementById("deviceSearch")
+                .value
+                .toLowerCase();
+
+            const filtered = allDevices.filter(device => {
+
+                const name = String(device.deviceName || "").toLowerCase();
+                const employee = String(device.employeeName || "").toLowerCase();
+
+                return name.includes(search) || employee.includes(search);
+
+            });
+
+
+            list.innerHTML = "";
+
+            if (filtered.length === 0) {
+
+                list.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="message">
+                            No matching computers found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+
+            }
+
+
+            filtered.forEach(device => {
+
+                const row = document.createElement("tr");
+
+                const values = [
+                    device.deviceName,
+                    device.employeeName,
+                    null,
+                    formatDate(device.lastActivity),
+                    formatDate(device.lastHeartbeat)
+                ];
+
+                values.forEach((value, index) => {
+
+                    const cell = document.createElement("td");
+
+                    if (index === 2) {
+
+                        cell.appendChild(
+                            createStatusBadge(device.currentStatus || "OFFLINE")
+                        );
+
+                    } else {
+
+                        cell.textContent = value || "-";
+
+                    }
+
+                    row.appendChild(cell);
+
+                });
+
+                list.appendChild(row);
+
+            });
+
+}
+
+
+// ============================================
+// EMPLOYEE FILTER
+// ============================================
+
+function loadEmployeeFilter(devices) {
+
+            const filter = document.getElementById("employeeFilter");
+
+            const selectedValue = filter.value;
+
+            filter.innerHTML =
+                '<option value="">All Employees</option>';
+
+
+            devices.forEach(device => {
+
+                const option = document.createElement("option");
+
+                option.value = device.id;
+
+                option.textContent =
+                    `${device.employeeName || "Unknown"} (${device.deviceName || "Unknown"})`;
+
+                filter.appendChild(option);
+
+            });
+
+
+            filter.value = selectedValue;
+
+}
+
+
+// ============================================
+// LOAD ACTIVITY EVENTS
+// ============================================
+
+async function loadEvents() {
+
+            const list = document.getElementById("activityList");
+
+            try {
+
+                const deviceId =
+                    document.getElementById("employeeFilter").value;
+
+                const selectedDate =
+                    document.getElementById("dateFilter").value;
+
+                const params = new URLSearchParams();
+
+
+                if (deviceId) {
+                    params.set("deviceId", deviceId);
+                }
+
+
+                if (selectedDate) {
+
+                    const start = new Date(selectedDate + "T00:00:00");
+
+                    const end = new Date(selectedDate + "T00:00:00");
+
+                    end.setDate(end.getDate() + 1);
+
+                    params.set("startUtc", start.toISOString());
+
+                    params.set("endUtc", end.toISOString());
+
+                }
+
+
+                const response = await fetch(
+                    "/api/events?" + params.toString()
+                );
+
+                if (!response.ok) {
+                    throw new Error("Unable to load activity history.");
+                }
+
+                const events = await response.json();
+
+                if (!Array.isArray(events)) {
+                    throw new Error("Invalid activity data received.");
+                }
+
+
+                list.innerHTML = "";
+
+
+                if (events.length === 0) {
+
+                    list.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="message">
+                                No activity found.
+                            </td>
+                        </tr>
+                    `;
+
+                    document.getElementById("activityCount").textContent =
+                        "0 activity records";
+
+                    return;
+
+                }
+
+
+                events.forEach(event => {
+
+                    const row = document.createElement("tr");
+
+                    const values = [
+                        formatDate(event.eventTime),
+                        event.employeeName,
+                        event.deviceName
+                    ];
+
+                    values.forEach(value => {
+
+                        const cell = document.createElement("td");
+
+                        cell.textContent = value || "-";
+
+                        row.appendChild(cell);
+
+                    });
+
+
+                    // Activity badge
+
+                    const activityCell = document.createElement("td");
+
+                    activityCell.appendChild(
+                        createStatusBadge(event.eventType)
+                    );
+
+                    row.appendChild(activityCell);
+
+
+                    list.appendChild(row);
+
+                });
+
+
+                document.getElementById("activityCount").textContent =
+                    `${events.length} activity records`;
+
+            } catch (error) {
+
+                console.error(error);
+
+                list.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="message">
+                            Unable to load activity.
+                        </td>
+                    </tr>
+                `;
+
+                document.getElementById("activityCount").textContent =
+                    "Error loading activity records.";
+
+            }
+
+}
+
+
+// ============================================
+// RESET FILTERS
+// ============================================
+
+function resetEventFilters() {
+
+            document.getElementById("employeeFilter").value = "";
+
+            document.getElementById("dateFilter").value = "";
+
+            loadEvents();
+
+}
+
+
+// ============================================
+// MANUAL REFRESH
+// ============================================
+
+async function refreshDashboard() {
+
+            await Promise.all([
+                loadDevices(),
+                loadEvents()
+            ]);
+
+}
+
+
+// ============================================
+// INITIALIZE DASHBOARD
+// ============================================
+
+refreshDashboard();
+
+
+// Automatic refresh every 10 seconds
+
+setInterval(() => {
+
+            loadDevices();
+
+            loadEvents();
+
+}, 10000);
+
+
+    </script>
+
+</body>
+</html>

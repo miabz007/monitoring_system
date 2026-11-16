@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../SiteMonitor.Agent/SiteMonitor.Agent.csproj" />
+  <Project Path="redstack_monitoring.csproj" />
+</Solution>

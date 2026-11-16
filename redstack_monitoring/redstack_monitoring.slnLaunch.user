@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "redstack_monitoring.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "..\\SiteMonitor.Agent\\SiteMonitor.Agent.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -1,0 +1,6 @@
+@redstack_monitoring_HostAddress = http://localhost:5263
+
+GET {{redstack_monitoring_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
